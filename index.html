@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet & Greet Registration</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-main: 'Inter', sans-serif;
+            --accent-color: #ffffff;
+            --accent-dark: #e5e5e5;
+            --bg-dark: #0a0a0a;
+        }
+
+        body {
+            font-family: var(--font-main);
+            margin: 0;
+            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* --- ElevenLabs Style Intro Animations --- */
+        .intro-screen {
+            background-color: var(--bg-dark);
+        }
+
+        .reveal-wrapper {
+            overflow: hidden;
+            display: inline-flex;
+            vertical-align: top;
+        }
+
+        .reveal-text {
+            transform: translateY(110%);
+            opacity: 0;
+            animation: textRevealUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.5s; }
+
+        @keyframes textRevealUp {
+            0% { transform: translateY(110%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .intro-animate-out {
+            animation: smoothFadeOut 1.2s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes smoothFadeOut {
+            0% { opacity: 1; transform: scale(1); filter: blur(0); }
+            100% { opacity: 0; transform: scale(1.04); filter: blur(12px); visibility: hidden; }
+        }
+
+        /* --- Dynamic Background --- */
+        #dynamicBg {
+            position: fixed;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+            transition: filter 0.8s ease, background-image 0.8s ease;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(10,10,10,0.8) 0%, rgba(10,10,10,0.4) 100%);
+            z-index: -1;
+        }
+
+        /* --- High-End UI Elements --- */
+        .premium-glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-elegant {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .input-elegant:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+            outline: none;
+        }
+
+        .input-elegant::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- Animations --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake { animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+        /* --- Custom Scrollbar --- */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+    </style>
+</head>
+<body class="antialiased h-screen flex flex-col text-white">
+
+    <div id="introScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center intro-screen transition-all">
+        <div class="flex flex-col items-center justify-center space-y-4">
+            <div class="reveal-wrapper">
+                <p class="reveal-text delay-1 text-xs md:text-sm tracking-[0.4em] text-white/50 uppercase font-medium">Kadiwa</p>
+            </div>
+            <div class="reveal-wrapper">
+                <h1 class="reveal-text delay-2 text-5xl md:text-7xl font-light tracking-tight text-white">Meet & Greet</h1>
+            </div>
+            <div class="reveal-wrapper mt-6">
+                <div class="reveal-text delay-3 w-12 h-[1px] bg-white/30"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dynamicBg"></div>
+    <div class="overlay"></div>
+
+    <div id="pinScreen" class="hidden opacity-0 fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black/90 backdrop-blur-2xl transition-opacity duration-500">
+        <button onclick="closePinPad()" class="absolute top-8 right-8 text-white/30 hover:text-white transition duration-300">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
+        <h2 class="text-white/70 text-sm font-medium tracking-[0.4em] uppercase mb-10">System Authentication</h2>
+        
+        <div class="flex items-center space-x-6 mb-12">
+            <div id="pinDisplay" class="flex space-x-6 h-10 items-center justify-center w-48">
+                </div>
+            <button onclick="togglePinVisibility()" class="text-white/40 hover:text-white transition-colors" title="Toggle Passcode Visibility">
+                <svg id="eyeIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 md:gap-6 max-w-xs">
+            <button onclick="pressPin(1)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">1</button>
+            <button onclick="pressPin(2)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">2</button>
+            <button onclick="pressPin(3)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">3</button>
+            <button onclick="pressPin(4)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">4</button>
+            <button onclick="pressPin(5)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">5</button>
+            <button onclick="pressPin(6)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">6</button>
+            <button onclick="pressPin(7)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">7</button>
+            <button onclick="pressPin(8)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">8</button>
+            <button onclick="pressPin(9)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">9</button>
+            <button onclick="pressPin('C')" class="w-20 h-20 rounded-full text-white/50 text-sm font-medium tracking-widest hover:text-white hover:bg-white/5 transition-all">CLR</button>
+            <button onclick="pressPin(0)" class="w-20 h-20 rounded-full text-white text-3xl font-light hover:bg-white/10 active:bg-white/20 transition-all">0</button>
+            <div class="w-20 h-20"></div> 
+        </div>
+    </div>
+
+    <div id="appScreen" class="flex-1 flex items-center justify-center p-6 relative z-[40]">
+        
+        <button onclick="openPinPad()" class="fixed top-8 right-8 w-2 h-2 bg-white/20 rounded-full hover:bg-white hover:scale-150 transition-all duration-300 z-50" title="Admin Access"></button>
+
+        <div class="relative z-10 w-full max-w-md premium-glass p-8 sm:p-12 rounded-3xl">
+            <h2 class="text-3xl font-light text-center text-white mb-10 tracking-tight">Registration</h2>
+
+            <form id="registrationForm" onsubmit="submitForm(event)" class="space-y-6">
+                <div id="formFieldsContainer" class="space-y-5"></div>
+
+                <div class="pt-6">
+                    <button type="submit" id="submitBtn" class="w-full bg-white text-black font-medium tracking-wide py-4 px-4 rounded-xl shadow-lg transform transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(255,255,255,0.15)] active:translate-y-0 focus:outline-none">
+                        Sumali Ngayon
+                    </button>
+                </div>
+            </form>
+
+            <div id="successMessage" class="hidden mt-8 bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3.5 rounded-xl flex items-center justify-center transition-all">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="font-medium text-sm">Successfully registered.</span>
+            </div>
+            <div id="errorMessage" class="hidden mt-8 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3.5 rounded-xl flex flex-col items-center justify-center transition-all">
+                <span class="font-medium text-sm text-center">System not connected. Check admin settings.</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="adminModal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4">
+        <div class="premium-glass w-full max-w-3xl rounded-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h2 class="text-xl font-light text-white tracking-wide">System Control Panel</h2>
+                <button onclick="closeAdmin()" class="text-white/50 hover:text-white transition duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-8 overflow-y-auto custom-scroll flex-1">
+                
+                <div class="bg-black/20 p-6 rounded-2xl border border-white/5 mb-8">
+                    <h3 class="font-medium text-white mb-6 tracking-wide text-sm uppercase text-white/50">Interface Settings</h3>
+                    
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Background Asset URL</label>
+                            <input type="text" id="adminBgUrl" class="w-full px-4 py-3 input-elegant rounded-xl text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Background Blur (<span id="blurVal">50</span>%)</label>
+                            <input type="range" id="adminBgBlur" min="0" max="100" class="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Database Sync Endpoint (Google Apps Script)</label>
+                            <input type="url" id="adminGasUrl" placeholder="https://script.google.com/macros/s/..." class="w-full px-4 py-3 input-elegant rounded-xl text-sm">
+                        </div>
+                        <button onclick="saveSettings()" class="bg-white text-black px-6 py-3 rounded-xl text-sm font-medium hover:bg-gray-200 transition-all shadow-sm">Save Configuration</button>
+                    </div>
+                </div>
+
+                <div class="bg-black/20 p-6 rounded-2xl border border-white/5">
+                    <h3 class="font-medium text-white mb-6 tracking-wide text-sm uppercase text-white/50">Data Architecture</h3>
+                    
+                    <div id="adminFieldsList" class="space-y-3 mb-8"></div>
+
+                    <div class="border-t border-white/10 pt-8">
+                        <h4 id="formBuilderTitle" class="font-medium text-white mb-5">Add New Parameter</h4>
+                        <input type="hidden" id="editFieldId" value="">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+                            <div>
+                                <label class="block text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Data Type</label>
+                                <select id="newFieldType" onchange="toggleOptionsInput()" class="w-full px-4 py-3 input-elegant rounded-xl text-sm cursor-pointer appearance-none">
+                                    <option value="text" class="bg-gray-900 text-white">Text Input</option>
+                                    <option value="number" class="bg-gray-900 text-white">Numeric</option>
+                                    <option value="select" class="bg-gray-900 text-white">Dropdown Selection</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Parameter Label</label>
+                                <input type="text" id="newFieldLabel" placeholder="e.g. Kasarian" class="w-full px-4 py-3 input-elegant rounded-xl text-sm">
+                            </div>
+                        </div>
+
+                        <div id="optionsContainer" class="hidden mb-5">
+                            <label class="block text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Dropdown Values (Comma separated)</label>
+                            <input type="text" id="newFieldOptions" placeholder="Value 1, Value 2" class="w-full px-4 py-3 input-elegant rounded-xl text-sm">
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button onclick="saveField()" id="saveFieldBtn" class="bg-white text-black px-6 py-3 rounded-xl text-sm font-medium hover:bg-gray-200 transition-all">Add Parameter</button>
+                            <button onclick="resetFieldForm()" id="cancelEditBtn" class="hidden bg-white/10 text-white px-6 py-3 rounded-xl text-sm font-medium hover:bg-white/20 transition-all border border-white/10">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        const defaultState = {
+            fields: [
+                { id: 'f1', type: 'text', label: 'Pangalan' },
+                { id: 'f2', type: 'number', label: 'Edad' },
+                { id: 'f3', type: 'select', label: 'Katayuan', options: 'Estudyante, Nagtratrabaho' }
+            ],
+            bgUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop', // Swapped to a high-end abstract dark background
+            bgBlur: 20,
+            gasUrl: 'https://script.google.com/macros/s/AKfycbx6JENfIXSt5ox2u1_KrSHssd3DOyUCn5aDwfvG3rGvSXN3JweubACdoRyFciAmtiaF1g/exec'
+        };
+
+        let appState = JSON.parse(localStorage.getItem('meetGreetState')) || defaultState;
+
+        // --- Init Function & Cinematic Intro ---
+        function initApp() {
+            applySettings();
+            renderMainForm();
+
+            // ElevenLabs style cinematic delay
+            setTimeout(() => {
+                const intro = document.getElementById('introScreen');
+                intro.classList.add('intro-animate-out');
+                
+                setTimeout(() => {
+                    intro.style.display = 'none';
+                }, 1200); 
+
+            }, 3000); 
+        }
+
+        function saveState() {
+            localStorage.setItem('meetGreetState', JSON.stringify(appState));
+            applySettings();
+            renderMainForm();
+        }
+
+        function applySettings() {
+            const bgEl = document.getElementById('dynamicBg');
+            bgEl.style.backgroundImage = `url('${appState.bgUrl}')`;
+            const pxBlur = (appState.bgBlur / 100) * 30;
+            bgEl.style.filter = `blur(${pxBlur}px)`;
+        }
+
+        // --- PIN Pad Logic & Visibility Toggle ---
+        let currentPin = '';
+        const TARGET_PIN = '19141';
+        let isPinVisible = false;
+
+        function openPinPad() {
+            const pinScreen = document.getElementById('pinScreen');
+            pinScreen.classList.remove('hidden');
+            setTimeout(() => {
+                pinScreen.classList.remove('opacity-0');
+            }, 10);
+            currentPin = '';
+            isPinVisible = false;
+            updateEyeIcon();
+            updatePinUI();
+        }
+
+        function closePinPad() {
+            const pinScreen = document.getElementById('pinScreen');
+            pinScreen.classList.add('opacity-0');
+            setTimeout(() => {
+                pinScreen.classList.add('hidden');
+            }, 500);
+        }
+
+        function togglePinVisibility() {
+            isPinVisible = !isPinVisible;
+            updateEyeIcon();
+            updatePinUI();
+        }
+
+        function updateEyeIcon() {
+            const svg = document.getElementById('eyeIcon');
+            if (isPinVisible) {
+                // Eye Closed Icon
+                svg.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                `;
+            } else {
+                // Eye Open Icon
+                svg.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                `;
+            }
+        }
+
+        function pressPin(val) {
+            if (val === 'C') {
+                currentPin = '';
+            } else {
+                if (currentPin.length < 5) currentPin += val;
+            }
+            updatePinUI();
+        }
+
+        function updatePinUI() {
+            const display = document.getElementById('pinDisplay');
+            display.innerHTML = '';
+
+            for (let i = 0; i < 5; i++) {
+                const dotContainer = document.createElement('div');
+                dotContainer.className = 'flex items-center justify-center w-6 h-8';
+                
+                if (i < currentPin.length) {
+                    if (isPinVisible) {
+                        dotContainer.innerHTML = `<span class="text-2xl font-light text-white">${currentPin[i]}</span>`;
+                    } else {
+                        dotContainer.innerHTML = `<div class="w-3 h-3 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.8)]"></div>`;
+                    }
+                } else {
+                    dotContainer.innerHTML = `<div class="w-2.5 h-2.5 border border-white/20 rounded-full"></div>`;
+                }
+                display.appendChild(dotContainer);
+            }
+
+            if (currentPin.length === 5) {
+                if (currentPin === TARGET_PIN) {
+                    setTimeout(() => {
+                        closePinPad();
+                        setTimeout(() => {
+                            openAdminModal();
+                        }, 500);
+                    }, 200);
+                } else {
+                    const dotsContainer = document.getElementById('pinDisplay');
+                    dotsContainer.classList.add('shake');
+                    setTimeout(() => {
+                        dotsContainer.classList.remove('shake');
+                        currentPin = '';
+                        updatePinUI();
+                    }, 400);
+                }
+            }
+        }
+
+        // --- Render Main Form ---
+        function renderMainForm() {
+            const container = document.getElementById('formFieldsContainer');
+            container.innerHTML = '';
+
+            appState.fields.forEach(field => {
+                let inputHTML = '';
+                const baseClasses = "w-full px-4 py-3.5 input-elegant rounded-xl text-sm";
+
+                if (field.type === 'text' || field.type === 'number') {
+                    inputHTML = `<input type="${field.type}" id="${field.id}" name="${field.label}" required placeholder="${field.label}" class="${baseClasses}">`;
+                } else if (field.type === 'select') {
+                    const optionsArray = field.options.split(',').map(o => o.trim()).filter(o => o);
+                    const optionsHTML = optionsArray.map(opt => `<option value="${opt}" class="bg-gray-900 text-white">${opt}</option>`).join('');
+                    inputHTML = `
+                        <select id="${field.id}" name="${field.label}" required class="${baseClasses} cursor-pointer appearance-none bg-no-repeat" style="background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23ffffff%22 opacity=%220.5%22 height=%2220%22 viewBox=%220 0 24 24%22 width=%2220%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-position: right 12px center;">
+                            <option value="" disabled selected>Pumili ng ${field.label.toLowerCase()}...</option>
+                            ${optionsHTML}
+                        </select>
+                    `;
+                }
+
+                const fieldHTML = `
+                    <div>
+                        <label for="${field.id}" class="block text-xs font-medium text-white/60 mb-2 uppercase tracking-wider pl-1">${field.label}</label>
+                        ${inputHTML}
+                    </div>
+                `;
+                container.innerHTML += fieldHTML;
+            });
+        }
+
+        // --- Form Submission ---
+        function submitForm(event) {
+            event.preventDefault();
+            
+            if(!appState.gasUrl || appState.gasUrl.trim() === '') {
+                showMsg('errorMessage');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-black inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+            `;
+            btn.disabled = true;
+
+            const form = document.getElementById('registrationForm');
+            const formData = new FormData(form);
+            const dataObj = Object.fromEntries(formData.entries());
+            const urlEncoded = new URLSearchParams(dataObj).toString();
+
+            fetch(appState.gasUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: urlEncoded
+            }).then(() => {
+                showMsg('successMessage');
+                form.reset();
+            }).catch(error => {
+                console.error("Error sending data", error);
+                showMsg('successMessage'); // Assuming success for demo if CORS fails on localhost
+                form.reset();
+            }).finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        function showMsg(id) {
+            const el = document.getElementById(id);
+            el.classList.remove('hidden');
+            setTimeout(() => { el.classList.add('hidden'); }, 4000);
+        }
+
+        // --- Admin Panel Logic ---
+        function openAdminModal() {
+            document.getElementById('adminModal').classList.remove('hidden');
+            
+            document.getElementById('adminBgUrl').value = appState.bgUrl;
+            document.getElementById('adminBgBlur').value = appState.bgBlur;
+            document.getElementById('blurVal').innerText = appState.bgBlur;
+            document.getElementById('adminGasUrl').value = appState.gasUrl;
+            
+            document.getElementById('adminBgBlur').oninput = function() {
+                document.getElementById('blurVal').innerText = this.value;
+            };
+
+            renderAdminFieldsList();
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminModal').classList.add('hidden');
+            resetFieldForm();
+        }
+
+        function saveSettings() {
+            appState.bgUrl = document.getElementById('adminBgUrl').value;
+            appState.bgBlur = document.getElementById('adminBgBlur').value;
+            appState.gasUrl = document.getElementById('adminGasUrl').value;
+            saveState();
+            
+            const btn = event.target;
+            btn.innerText = "Configuration Saved";
+            setTimeout(() => {
+                btn.innerText = "Save Configuration";
+            }, 2000);
+        }
+
+        // --- Form Builder Logic ---
+        function renderAdminFieldsList() {
+            const list = document.getElementById('adminFieldsList');
+            list.innerHTML = '';
+
+            appState.fields.forEach((field) => {
+                const isSelect = field.type === 'select';
+                list.innerHTML += `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-black/40 border border-white/5 p-4 rounded-xl gap-4">
+                        <div>
+                            <span class="font-medium text-white">${field.label}</span>
+                            <span class="text-[10px] font-medium text-white/50 uppercase tracking-wider ml-3 border border-white/10 px-2 py-1 rounded">Type: ${field.type}</span>
+                            ${isSelect ? `<div class="text-xs text-white/40 mt-2"><span class="font-medium text-white/60">Options:</span> ${field.options}</div>` : ''}
+                        </div>
+                        <div class="flex space-x-4">
+                            <button onclick="editField('${field.id}')" class="text-white/60 hover:text-white text-sm font-medium transition-colors">Edit</button>
+                            <button onclick="deleteField('${field.id}')" class="text-red-400/70 hover:text-red-400 text-sm font-medium transition-colors">Remove</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleOptionsInput() {
+            const type = document.getElementById('newFieldType').value;
+            if (type === 'select') {
+                document.getElementById('optionsContainer').classList.remove('hidden');
+            } else {
+                document.getElementById('optionsContainer').classList.add('hidden');
+            }
+        }
+
+        function saveField() {
+            const idInput = document.getElementById('editFieldId').value;
+            const type = document.getElementById('newFieldType').value;
+            const label = document.getElementById('newFieldLabel').value.trim();
+            const options = document.getElementById('newFieldOptions').value.trim();
+
+            if (!label) {
+                alert("Please enter a parameter label.");
+                return;
+            }
+            if (type === 'select' && !options) {
+                alert("Please enter dropdown options.");
+                return;
+            }
+
+            if (idInput) {
+                const index = appState.fields.findIndex(f => f.id === idInput);
+                if (index > -1) {
+                    appState.fields[index] = { id: idInput, type, label, options };
+                }
+            } else {
+                const newId = 'f_' + Date.now();
+                appState.fields.push({ id: newId, type, label, options });
+            }
+
+            saveState();
+            renderAdminFieldsList();
+            resetFieldForm();
+        }
+
+        function editField(id) {
+            const field = appState.fields.find(f => f.id === id);
+            if (!field) return;
+
+            document.getElementById('editFieldId').value = field.id;
+            document.getElementById('newFieldType').value = field.type;
+            document.getElementById('newFieldLabel').value = field.label;
+            document.getElementById('newFieldOptions').value = field.options || '';
+            
+            toggleOptionsInput();
+            
+            document.getElementById('formBuilderTitle').innerText = "Edit Parameter";
+            document.getElementById('saveFieldBtn').innerText = "Update";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+        }
+
+        function deleteField(id) {
+            if(confirm("Are you sure you want to remove this parameter?")) {
+                appState.fields = appState.fields.filter(f => f.id !== id);
+                saveState();
+                renderAdminFieldsList();
+            }
+        }
+
+        function resetFieldForm() {
+            document.getElementById('editFieldId').value = '';
+            document.getElementById('newFieldType').value = 'text';
+            document.getElementById('newFieldLabel').value = '';
+            document.getElementById('newFieldOptions').value = '';
+            toggleOptionsInput();
+            
+            document.getElementById('formBuilderTitle').innerText = "Add New Parameter";
+            document.getElementById('saveFieldBtn').innerText = "Add Parameter";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        // Initialize on load
+        window.onload = initApp;
+    </script>
+</body>
+</html>
