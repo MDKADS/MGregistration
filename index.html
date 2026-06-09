@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=200;300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -27,9 +27,17 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* --- ElevenLabs Style Intro Animations --- */
+        /* --- iPhone Style Webex Fluid Gradient Intro --- */
         .intro-screen {
-            background-color: var(--bg-dark);
+            background: linear-gradient(-45deg, #0050e6, #6414c8, #e60067, #ff5000, #00a0a0);
+            background-size: 400% 400%;
+            animation: webexIphoneFlow 12s ease infinite;
+        }
+
+        @keyframes webexIphoneFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .reveal-wrapper {
@@ -130,13 +138,13 @@
     <div id="introScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center intro-screen transition-all">
         <div class="flex flex-col items-center justify-center space-y-4">
             <div class="reveal-wrapper">
-                <p class="reveal-text delay-1 text-xs md:text-sm tracking-[0.4em] text-white/50 uppercase font-medium">Kadiwa</p>
+                <p class="reveal-text delay-1 text-xs md:text-sm tracking-[0.4em] text-white/70 uppercase font-semibold">Kadiwa</p>
             </div>
             <div class="reveal-wrapper">
-                <h1 class="reveal-text delay-2 text-5xl md:text-7xl font-light tracking-tight text-white">Meet & Greet</h1>
+                <h1 class="reveal-text delay-2 text-5xl md:text-7xl font-light tracking-tight text-white drop-shadow-sm">Meet & Greet</h1>
             </div>
             <div class="reveal-wrapper mt-6">
-                <div class="reveal-text delay-3 w-12 h-[1px] bg-white/30"></div>
+                <div class="reveal-text delay-3 w-12 h-[1px] bg-white/40"></div>
             </div>
         </div>
     </div>
